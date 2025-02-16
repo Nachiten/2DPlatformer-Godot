@@ -284,7 +284,11 @@ position = Vector2(286, -108)
 [node name="Platforms" type="Node" parent="."]
 
 [node name="Platform2" parent="Platforms" instance=ExtResource("3_8cni7")]
+visible = false
 position = Vector2(-97, 19)
+
+[node name="CollisionShape2D" parent="Platforms/Platform2" index="1"]
+disabled = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Platforms/Platform2"]
 libraries = {
@@ -334,3 +338,5 @@ theme_override_colors/font_color = Color(1.22733e-06, 0, 0.472347, 1)
 theme_override_fonts/font = ExtResource("8_l7rka")
 theme_override_font_sizes/font_size = 8
 text = "Puto el q lee"
+
+[editable path="Platforms/Platform2"]

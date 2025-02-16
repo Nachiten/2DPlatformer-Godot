@@ -1,7 +1,8 @@
-[gd_scene load_steps=26 format=3 uid="uid://dpjgqu4kyhhwe"]
+[gd_scene load_steps=31 format=3 uid="uid://dpjgqu4kyhhwe"]
 
 [ext_resource type="Texture2D" uid="uid://dwq5fexpt2h3d" path="res://assets/sprites/knight.png" id="1_6pn6q"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_k5cmw"]
+[ext_resource type="Script" path="res://scripts/coyote_debug_info.gd" id="3_l6ecu"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3y4vg"]
 atlas = ExtResource("1_6pn6q")
@@ -171,6 +172,24 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_5jbb3"]
 radius = 5.0
 
+[sub_resource type="Gradient" id="Gradient_42je0"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_riawe"]
+gradient = SubResource("Gradient_42je0")
+width = 10
+height = 10
+
+[sub_resource type="Gradient" id="Gradient_4bvhe"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_rh8md"]
+gradient = SubResource("Gradient_4bvhe")
+width = 10
+height = 10
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 5
 collision_layer = 2
@@ -185,3 +204,23 @@ autoplay = "idle"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -5)
 shape = SubResource("CircleShape2D_5jbb3")
+
+[node name="CoyoteTime" type="Timer" parent="."]
+wait_time = 0.08
+one_shot = true
+
+[node name="CoyoteDebugInfo" type="Node2D" parent="."]
+visible = false
+script = ExtResource("3_l6ecu")
+
+[node name="CoyoteEnabled" type="Sprite2D" parent="CoyoteDebugInfo"]
+visible = false
+position = Vector2(0, -29)
+texture = SubResource("GradientTexture2D_riawe")
+
+[node name="CoyoteDisabled" type="Sprite2D" parent="CoyoteDebugInfo"]
+position = Vector2(0, -29)
+texture = SubResource("GradientTexture2D_rh8md")
+
+[connection signal="can_coyote_jump_changed" from="." to="." method="_on_can_coyote_jump_changed"]
+[connection signal="timeout" from="CoyoteTime" to="." method="_on_coyote_time_timeout"]

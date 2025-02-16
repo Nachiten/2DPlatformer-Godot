@@ -5,17 +5,33 @@ const SPEED = 130.0
 const JUMP_VELOCITY = -300.0
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var coyote_time: Timer = $CoyoteTime
 
 enum JumpState { FLOOR, JUMPING_UP, JUMPING_DOWN, FALLING }
 var jump_state = JumpState.FLOOR
+var can_coyote_jump = false
+
+signal can_coyote_jump_changed(newValue)
 
 func set_jump_state(newState: JumpState) -> void:
 	if newState == jump_state:
 		return
 
 	jump_state = newState
-
 	print("New state: ", JumpState.keys()[jump_state])
+
+	match newState:
+		JumpState.FALLING:
+			coyote_time.start()
+			can_coyote_jump = true
+			can_coyote_jump_changed.emit(can_coyote_jump)
+		JumpState.FLOOR:
+			can_coyote_jump = false
+			can_coyote_jump_changed.emit(can_coyote_jump)
+
+func _on_coyote_time_timeout() -> void:
+	can_coyote_jump = false
+	can_coyote_jump_changed.emit(can_coyote_jump)
 
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -30,10 +46,13 @@ func _physics_process(delta: float) -> void:
 		set_jump_state(JumpState.FLOOR)
 
 	# Handle jump.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and (is_on_floor() or can_coyote_jump):
+		can_coyote_jump = false
+		can_coyote_jump_changed.emit(can_coyote_jump)
 		velocity.y = JUMP_VELOCITY
 		set_jump_state(JumpState.JUMPING_UP)
 	elif jump_state == JumpState.JUMPING_UP and velocity.y > 0:
+		# If velocity went from negative to positive, we started falling down from the jump
 		set_jump_state(JumpState.JUMPING_DOWN)
 
 	# Get the input direction: -1, 0, 1
